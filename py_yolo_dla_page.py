@@ -1,27 +1,27 @@
-"""
-Este script procesa imágenes de páginas de periódicos históricos por medio de un modelo YOLO para detectar y extraer columnas de texto.
-
-El programa realiza las siguientes tareas principales:
-1. Detecta encabezados, secciones y columnas en las imágenes.
-2. Ajusta los límites de las columnas basándose en las secciones y encabezados detectados.
-3. Elimina columnas superpuestas.
-4. Ordena las columnas por sección.
-5. Recorta y guarda las columnas como imágenes separadas.
-
-Requisitos:
-- ultralytics
-- opencv-python (cv2)
-- numpy
-
-El script espera un modelo YOLO entrenado en la ruta "./modelo/yolo11x-layout.pt".
-"""
+# 
+# Este script procesa imágenes de páginas de periódicos históricos por medio de un modelo YOLO para detectar y extraer columnas de texto.
+# 
+# El programa realiza las siguientes tareas principales:
+# 1. Detecta encabezados, secciones y columnas en las imágenes.
+# 2. Ajusta los límites de las columnas basándose en las secciones y encabezados detectados.
+# 3. Elimina columnas superpuestas.
+# 4. Ordena las columnas por sección.
+# 5. Recorta y guarda las columnas como imágenes separadas.
+# 
+# Requisitos:
+# - ultralytics
+# - opencv-python (cv2)
+# - numpy
+# 
+# El script espera un modelo YOLO entrenado en la ruta "./modelo/yolo11x-layout.pt".
+# 
 
 # Importaciones necesarias
-from ultralytics import YOLO  # Para cargar y usar el modelo YOLO
-import cv2  # Para procesamiento de imágenes
-import numpy as np  # Para operaciones numéricas eficientes
+from ultralytics import YOLO         # Para cargar y usar el modelo YOLO
+import cv2                           # Para procesamiento de imágenes
+import numpy as np                   # Para operaciones numéricas eficientes
 from collections import defaultdict  # Para crear diccionarios con valores por defecto
-import os  # Para operaciones de sistema de archivos
+import os                            # Para operaciones de sistema de archivos
 
 def get_header_boundaries(boxes, classes, names):
     """
