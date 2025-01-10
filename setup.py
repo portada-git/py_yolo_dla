@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='py_yolo_dla',
-      version='0.0.2',
+      version='0.0.3',
       description='Process to get columns from documment images using a trained YOLO model in PortADa project',
       author='PortADa team',
       author_email='jcbportada@gmail.com',
@@ -10,7 +10,7 @@ setup(name='py_yolo_dla',
       packages=['py_yolo_dla'],
       py_modules=['py_yolo_dla_page'],
       install_requires=[
-          'urllib3'
+          'urllib3',
           'opencv-python',
           'numpy < 2',
           'ultralytics',

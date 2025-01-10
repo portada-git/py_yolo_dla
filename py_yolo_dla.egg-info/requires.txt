@@ -1,3 +1,4 @@
-urllib3opencv-python
+urllib3
+opencv-python
 numpy<2
 ultralytics
