@@ -1,0 +1,3 @@
+urllib3opencv-python
+numpy<2
+ultralytics
