@@ -341,8 +341,9 @@ def redefine_sections(sections):
     return result
 
 
-def get_model():
-    fpath = os.path.abspath(os.path.dirname(__file__))
+def get_model(fpath=None):
+    if fpath is None:
+        fpath = os.path.abspath(os.path.dirname(__file__))
     return YOLO(f"{fpath}/modelo/yolo11x-layout.pt")
 
 
