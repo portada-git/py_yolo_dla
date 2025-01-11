@@ -379,13 +379,15 @@ def cut_columns_as_json(image, sorted_sections, input_file):
     return ret
 
 
-def process_image_from_path(image_path, model=get_model()):
+def process_image_from_path(image_path, model=None):
+    if model is None:
+        model = get_model()
     image = cv2.imread(image_path)
     sorted_sections = process_image(image, model)
     return image, sorted_sections
 
 
-def process_image(image: np.array, model=get_model()):
+def process_image(image: np.array, model=None):
     """
     Procesa una imagen individual, detectando y ajustando las columnas.
 
@@ -396,6 +398,8 @@ def process_image(image: np.array, model=get_model()):
     Returns:
     tuple: (imagen_procesada, secciones_ordenadas)
     """
+    if model is None:
+        model = get_model()
     results = model.predict(image)
 
     boxes = results[0].boxes.xyxy.cpu().numpy()
@@ -492,7 +496,7 @@ def process_image(image: np.array, model=get_model()):
     return sorted_sections
 
 
-def process_directory(input_dir, output_dir, model=get_model()):
+def process_directory(input_dir, output_dir, model=None):
     """
     Procesa todas las imágenes en un directorio dado.
 
@@ -501,6 +505,9 @@ def process_directory(input_dir, output_dir, model=get_model()):
     output_dir (str): Directorio donde se guardarán las columnas recortadas.
     model (YOLO): Modelo YOLO cargado para la detección.
     """
+    if model is None:
+        model = get_model()
+
     for filename in os.listdir(input_dir):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
             input_path = os.path.join(input_dir, filename)
