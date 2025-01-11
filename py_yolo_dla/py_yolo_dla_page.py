@@ -343,8 +343,9 @@ def redefine_sections(sections):
 
 def get_model(fpath=None):
     if fpath is None:
-        fpath = os.path.abspath(os.path.dirname(__file__))
-    return YOLO(f"{fpath}/modelo/yolo11x-layout.pt")
+        p = os.path.abspath(os.path.dirname(__file__))
+        fpath = f"{p}/modelo/yolo11x-layout.pt"
+    return YOLO(fpath)
 
 
 def cut_columns_as_json(image, sorted_sections, input_file):

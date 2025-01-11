@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='py_yolo_dla',
-      version='0.0.5',
+      version='0.0.6',
       description='Process to get columns from documment images using a trained YOLO model in PortADa project',
       author='PortADa team',
       author_email='jcbportada@gmail.com',
