@@ -69,10 +69,8 @@ def get_section_boundaries(boxes, classes, names):
     return section_boxes
 
 
-def get_other_boundaries(boxes, classes, names, guess_page):
+def get_other_boundaries(boxes, classes, names):
     other_boxes = []
-    max_page_area = 0
-    max_page = None
     for box, cls in zip(boxes, classes):
         class_name = names[int(cls)]
         if class_name == 'bloque':
@@ -81,25 +79,27 @@ def get_other_boundaries(boxes, classes, names, guess_page):
         elif class_name == 'objeto':
             x1, y1, x2, y2 = map(int, box.tolist())
             other_boxes.append([x1, y1, x2, y2])
-        # elif class_name == 'pagina':
-        #     x1, y1, x2, y2 = map(int, box.tolist())
-        #     parea = (x2 - x1) * (y2 - y1)
-        #     if parea > max_page_area:
-        #         if max_page is not None:
-        #             other_boxes.append(max_page)
-        #         max_page_area = parea
-        #         max_page = [x1, y1, x2, y2]
-        #     else:
-        #         other_boxes.append([x1, y1, x2, y2])
-    # if max_page is not None:
-    #     intersection = max(0, min(max_page[2], guess_page[2]) - max(max_page[0], guess_page[0])) * max(0, min(max_page[3],guess_page[3]) - max(max_page[1],guess_page[1]))
-    #     guess_area = (guess_page[2] - guess_page[0]) * (guess_page[3] - guess_page[1])
-    #     union = max_page_area + guess_area - intersection
-    #     iou = intersection / union if union > 0 else 0
-    #     if iou < 0.80:
-    #         other_boxes.append(max_page)
-
     return other_boxes
+
+def get_page_boundaries(boxes, classes, names, guess_page):
+    max_page_area = 0
+    max_page = None
+    for box, cls in zip(boxes, classes):
+        class_name = names[int(cls)]
+        if class_name == 'pagina':
+            x1, y1, x2, y2 = map(int, box.tolist())
+            parea = (x2 - x1) * (y2 - y1)
+            if parea > max_page_area:
+                if max_page is not None:
+                    other_boxes.append(max_page)
+                max_page_area = parea
+                max_page = [x1, y1, x2, y2]
+            else:
+                other_boxes.append([x1, y1, x2, y2])
+    if max_page is None:
+        max_page = guess_page
+
+    return max_page
 
 
 def get_containing_section(column_box, section_boxes):
@@ -380,15 +380,15 @@ def cut_columns_as_json(image, sorted_sections, input_file):
     return ret
 
 
-def process_image_from_path(image_path, model=None):
+def get_sections_and_page_from_path(image_path, model=None):
     if model is None:
         model = get_model()
     image = cv2.imread(image_path)
-    sorted_sections = process_image(image, model)
-    return image, sorted_sections
+    sorted_sections, page = get_sections_and_page(image, model)
+    return image, sorted_sections, page
 
 
-def process_image(image: np.array, model=None):
+def get_sections_and_page(image: np.array, model=None):
     """
     Procesa una imagen individual, detectando y ajustando las columnas.
 
@@ -412,10 +412,8 @@ def process_image(image: np.array, model=None):
     horizontal_lines = get_horizontal_lines(boxes, classes, names)
     header_boxes = get_header_boundaries(boxes, classes, names)
     section_boxes = get_section_boundaries(boxes, classes, names)
-    other_boxes = get_other_boundaries(boxes, classes, names, guess_page)
-
-    # if len(section_boxes) > 0:
-    #     section_boxes = remove_overlapping_boxes(section_boxes)
+    other_boxes = get_other_boundaries(boxes, classes, names)
+    page_box = get_page_boundaries(boxes, classes, names, guess_page)
 
     original_column_boxes = []
     adjusted_column_boxes = []
@@ -494,7 +492,7 @@ def process_image(image: np.array, model=None):
     sorted_sections.sort(key=lambda X: X["box"][1] * 10000 + X["box"][0])
     sorted_sections = redefine_sections(sorted_sections)
 
-    return sorted_sections
+    return sorted_sections, page_box
 
 
 def process_directory(input_dir, output_dir, model=None):
@@ -514,7 +512,7 @@ def process_directory(input_dir, output_dir, model=None):
             input_path = os.path.join(input_dir, filename)
 
             try:
-                processed_image, sorted_sections = process_image_from_path(input_path, model)
+                processed_image, sorted_sections, page = get_sections_and_page_from_path(input_path, model)
                 cut_and_save_columns(processed_image, sorted_sections, input_path, output_dir)
             except Exception as e:
                 print(f"Error processing {filename}: {str(e)}")
