@@ -90,12 +90,8 @@ def get_page_boundaries(boxes, classes, names, guess_page):
             x1, y1, x2, y2 = map(int, box.tolist())
             parea = (x2 - x1) * (y2 - y1)
             if parea > max_page_area:
-                if max_page is not None:
-                    other_boxes.append(max_page)
                 max_page_area = parea
                 max_page = [x1, y1, x2, y2]
-            else:
-                other_boxes.append([x1, y1, x2, y2])
     if max_page is None:
         max_page = guess_page
 

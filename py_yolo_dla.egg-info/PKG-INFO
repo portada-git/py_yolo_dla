@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: py-yolo-dla
-Version: 0.0.7
+Version: 0.0.8
 Summary: Process to get columns from documment images using a trained YOLO model in PortADa project
 Home-page: https://github.com/portada-git/py_yolo_dla
 Author: PortADa team
