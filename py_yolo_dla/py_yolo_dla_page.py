@@ -81,6 +81,7 @@ def get_other_boundaries(boxes, classes, names):
             other_boxes.append([x1, y1, x2, y2])
     return other_boxes
 
+
 def get_page_boundaries(boxes, classes, names, guess_page):
     max_page_area = 0
     max_page = None
@@ -282,9 +283,9 @@ def sort_columns_by_section(columns, sections, guess_page=None):
     list: Lista de diccionarios, cada uno con una sección y sus columnas ordenadas.
     """
     if guess_page is None:
-        guess_page = [0, 0, float('inf'), float('inf')]
+        guess_page = [0, 0, 100000, 100000]
     if not sections:
-        return [{'box': [guess_page[0], guess_page[1], guess_page[2], guess_page[3]],
+        return [{'box': [int(guess_page[0]), int(guess_page[1]), int(guess_page[2]), int(guess_page[3])],
                  'columns': sorted(columns, key=lambda c: c[0])}]
 
     sorted_sections = sorted(sections, key=lambda s: s[1])
