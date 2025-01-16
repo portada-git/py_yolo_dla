@@ -3,7 +3,6 @@ README.md
 pyproject.toml
 setup.py
 py_yolo_dla/__init__.py
-py_yolo_dla/layout_structure.py
 py_yolo_dla/py_yolo_dla_page.py
 py_yolo_dla.egg-info/PKG-INFO
 py_yolo_dla.egg-info/SOURCES.txt

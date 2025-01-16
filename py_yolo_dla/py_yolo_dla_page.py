@@ -291,7 +291,18 @@ def sort_columns_by_section(columns, sections, guess_page=None):
     sorted_sections = sorted(sections, key=lambda s: s[1])
     result = []
     for section in sorted_sections:
-        section_columns = [col for col in columns if col[1] >= section[1] and col[3] <= section[3]]
+        section_columns = []
+        min_top = section[3]
+        max_bottom = section[1]
+        for col in columns:
+            if col[1] >= section[1] and col[3] <= section[3]:
+                section_columns.append(col)
+                if col[1] < min_top:
+                    min_top = col[1]
+                if col[3] > max_bottom:
+                    max_bottom = col[3]
+        section[1] = min_top
+        section[3] = max_bottom
         result.append({
             'box': section,
             'columns': sorted(section_columns, key=lambda c: c[0])
@@ -434,7 +445,10 @@ def get_sections_and_page(image: np.array, model=None):
         keep = True
         reduce_columns = []
         area_other = (other[2] - other[0]) * (other[3] - other[1])
+        need_columns = False
         for s, section in enumerate(sorted_sections):
+            if min(section['box'][3], other[3]) - max(section['box'][1], other[1]) > 0:
+                need_columns = True
             for c, col in enumerate(section["columns"]):
                 p_intersection = max(0, min(other[2], col[2]) - max(other[0], col[0])) * max(0, min(other[3],
                                                                                                     col[3]) - max(
@@ -449,9 +463,12 @@ def get_sections_and_page(image: np.array, model=None):
                     reduce_columns.append([s, c])
             if not keep:
                 break
+
         if keep:
-            # kept_others.append({'box': other, 'columns': [other]})
-            kept_others.append({'box': other, 'columns': []})
+            if need_columns:
+                kept_others.append({'box': other, 'columns': [other]})
+            else:
+                kept_others.append({'box': other, 'columns': []})
             for index in reduce_columns:
                 cy1 = sorted_sections[index[0]]["columns"][index[1]][1]
                 cy2 = sorted_sections[index[0]]["columns"][index[1]][3]
