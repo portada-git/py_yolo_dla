@@ -292,17 +292,10 @@ def sort_columns_by_section(columns, sections, guess_page=None):
     result = []
     for section in sorted_sections:
         section_columns = []
-        min_top = section[3]
-        max_bottom = section[1]
-        for col in columns:
-            if col[1] >= section[1] and col[3] <= section[3]:
-                section_columns.append(col)
-                if col[1] < min_top:
-                    min_top = col[1]
-                if col[3] > max_bottom:
-                    max_bottom = col[3]
-        section[1] = min_top
-        section[3] = max_bottom
+        if len(columns) > 0:
+            for col in columns:
+                if col[1] >= section[1] and col[3] <= section[3]:
+                    section_columns.append(col)
         result.append({
             'box': section,
             'columns': sorted(section_columns, key=lambda c: c[0])
@@ -505,7 +498,25 @@ def get_sections_and_page(image: np.array, model=None):
     sorted_sections.extend(kept_others)
     sorted_sections.sort(key=lambda X: X["box"][1] * 10000 + X["box"][0])
     sorted_sections = redefine_sections(sorted_sections)
-
+    for sorted_section in sorted_sections:
+        if len(sorted_section["columns"]) > 0:
+            min_top = sorted_section["box"][3]
+            max_bottom = sorted_section["box"][1]
+            min_left = sorted_section["box"][2]
+            max_right = sorted_section["box"][0]
+            for col in sorted_section["columns"]:
+                if min_top > col[1]:
+                    min_top = col[1]
+                if max_bottom < col[3]:
+                    max_bottom = col[3]
+                if min_left > col[0]:
+                    min_left = col[0]
+                if max_right < col[2]:
+                    max_right = col[2]
+            sorted_section["box"][0] = min_left
+            sorted_section["box"][1] = min_top
+            sorted_section["box"][2] = max_right
+            sorted_section["box"][3] = max_bottom
     return sorted_sections, page_box
 
 
